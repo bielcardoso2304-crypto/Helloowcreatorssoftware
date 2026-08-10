@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { loginSchema, signupSchema } from "@/lib/validations/auth";
+import { loginSchema, signupSchema, forgotPasswordSchema } from "@/lib/validations/auth";
 
 export type AuthActionState = { error: string | null };
 
@@ -74,4 +74,30 @@ export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export type ForgotPasswordActionState = { error: string | null; success: boolean };
+
+export async function requestPasswordReset(
+  _prevState: ForgotPasswordActionState,
+  formData: FormData
+): Promise<ForgotPasswordActionState> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+  if (!parsed.success) {
+    return {
+      error: parsed.error.issues[0]?.message ?? "Dados inválidos",
+      success: false,
+    };
+  }
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/redefinir-senha`,
+  });
+
+  // Always report success, even if the e-mail isn't registered — avoids
+  // leaking which addresses have an account.
+  return { error: null, success: true };
 }
