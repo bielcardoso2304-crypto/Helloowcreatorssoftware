@@ -28,7 +28,7 @@ export function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-56 shrink-0 flex-col border-r p-4">
+    <aside className="hidden h-screen w-56 shrink-0 flex-col border-r p-4 md:flex">
       <Link href="/" className="mb-8 px-2">
         <Logo />
       </Link>
