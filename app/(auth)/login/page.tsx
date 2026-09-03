@@ -23,7 +23,7 @@ export default function LoginPage() {
     <Card>
       <CardHeader>
         <CardTitle>Entrar</CardTitle>
-        <CardDescription>Acesse sua conta de criador Helloow.</CardDescription>
+        <CardDescription>Acesse sua conta na Helloow Creators.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
@@ -56,12 +56,23 @@ export default function LoginPage() {
             {pending ? "Entrando..." : "Entrar"}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          Não tem conta?{" "}
-          <Link href="/signup" className="underline underline-offset-4">
-            Criar conta
-          </Link>
-        </p>
+        <div className="mt-4 flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
+          <span>Não tem conta?</span>
+          <div className="flex w-full gap-2">
+            <Link
+              href="/signup?tipo=criador"
+              className="flex-1 rounded-lg border px-3 py-2 text-center font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              Sou criador
+            </Link>
+            <Link
+              href="/signup?tipo=marca"
+              className="flex-1 rounded-lg border px-3 py-2 text-center font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              Sou marca
+            </Link>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

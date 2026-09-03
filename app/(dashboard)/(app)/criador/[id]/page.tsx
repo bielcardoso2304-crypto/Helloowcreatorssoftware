@@ -5,13 +5,22 @@ import {
   getCurrentCreator,
   getDirectoryCreatorById,
   getConnectedUserIds,
+  getIsAdmin,
   type DirectoryCreator,
 } from "@/lib/get-current-creator";
+import { getCreatorRevenue } from "@/lib/get-deals";
 import { Avatar } from "@/components/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { connectCreator, disconnectCreator } from "../../connections-actions";
+import { DeleteMemberButton } from "../../delete-member-button";
+import { instagramUrl, tiktokUrl, youtubeUrl } from "@/lib/social-links";
+
+const currency = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
 const platformLabels: Record<DirectoryCreator["main_platform"], string> = {
   instagram: "Instagram",
@@ -73,16 +82,18 @@ export default async function CreatorDetailPage({
 }) {
   const { id } = await params;
 
-  const [member, creator, connectedIds] = await Promise.all([
+  const [member, creator, connectedIds, isAdmin] = await Promise.all([
     getDirectoryCreatorById(id),
     getCurrentCreator(),
     getConnectedUserIds(),
+    getIsAdmin(),
   ]);
 
   if (!member) notFound();
 
   const isSelf = member.user_id === creator?.user_id;
   const isConnected = connectedIds.has(member.user_id);
+  const revenue = isAdmin ? await getCreatorRevenue(member.user_id) : null;
 
   return (
     <div className="mx-auto max-w-2xl p-6">
@@ -154,19 +165,19 @@ export default async function CreatorDetailPage({
               <SocialRow
                 label="Instagram"
                 handle={member.instagram_handle}
-                url={member.instagram_url}
+                url={instagramUrl(member.instagram_handle)}
                 followers={member.instagram_followers}
               />
               <SocialRow
                 label="TikTok"
                 handle={member.tiktok_handle}
-                url={member.tiktok_url}
+                url={tiktokUrl(member.tiktok_handle)}
                 followers={member.tiktok_followers}
               />
               <SocialRow
                 label="YouTube"
                 handle={member.youtube_handle}
-                url={member.youtube_url}
+                url={youtubeUrl(member.youtube_handle)}
                 followers={member.youtube_followers}
               />
               <SocialRow
@@ -181,6 +192,41 @@ export default async function CreatorDetailPage({
           <p className="mt-6 text-xs text-muted-foreground">
             Na comunidade desde {dateFormatter.format(new Date(member.created_at))}
           </p>
+
+          {isAdmin && revenue && (
+            <div className="mt-6 border-t pt-4">
+              <p className="mb-3 text-sm font-medium">Área do admin</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Faturamento gerado
+                  </p>
+                  <p className="text-lg font-semibold tracking-tight">
+                    {currency.format(revenue.totalValue)}
+                  </p>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Lucro para a Helloow
+                  </p>
+                  <p className="text-lg font-semibold tracking-tight">
+                    {currency.format(revenue.totalEarning)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {revenue.dealCount === 0
+                  ? "Nenhum negócio registrado com este criador ainda."
+                  : `${revenue.dealCount} ${revenue.dealCount === 1 ? "negócio" : "negócios"} registrados.`}
+              </p>
+              <div className="mt-4">
+                <DeleteMemberButton
+                  userId={member.user_id}
+                  name={member.stage_name || member.full_name}
+                />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

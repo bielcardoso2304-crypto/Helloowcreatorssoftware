@@ -30,7 +30,7 @@ export function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
   return (
     <aside className="hidden h-screen w-56 shrink-0 flex-col border-r p-4 md:flex">
       <Link href="/" className="mb-8 px-2">
-        <Logo />
+        <Logo className="h-24" />
       </Link>
 
       <nav className="flex-1 space-y-1">

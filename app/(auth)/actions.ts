@@ -27,17 +27,33 @@ export async function login(
   redirect("/");
 }
 
+export type SignupActionState = { error: string | null; success: boolean };
+
 export async function signup(
-  _prevState: AuthActionState,
+  _prevState: SignupActionState,
   formData: FormData
-): Promise<AuthActionState> {
+): Promise<SignupActionState> {
   const parsed = signupSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Dados inválidos" };
+    return {
+      error: parsed.error.issues[0]?.message ?? "Dados inválidos",
+      success: false,
+    };
   }
+
+  // Server-side check — the checkbox's `required` attribute stops most
+  // people, but never trust the client alone for something LGPD-relevant.
+  if (formData.get("accepted_terms") !== "on") {
+    return {
+      error: "É preciso aceitar os Termos de Uso e a Política de Privacidade.",
+      success: false,
+    };
+  }
+
+  const accountType = formData.get("account_type") === "brand" ? "brand" : "creator";
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -47,6 +63,15 @@ export async function signup(
       // "Site URL" setting for the confirmation email link — which is
       // easy to leave pointed at a different local project.
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
+      // Persisted on the auth user itself (not a profile row, which
+      // doesn't exist until onboarding) so onboarding still knows which
+      // form to show after the user comes back from the confirmation
+      // e-mail in a fresh session. terms_accepted_at is the LGPD consent
+      // record — proof of when this account agreed to the current terms.
+      data: {
+        account_type: accountType,
+        terms_accepted_at: new Date().toISOString(),
+      },
     },
   });
   if (error) {
@@ -54,6 +79,7 @@ export async function signup(
       error: error.message.includes("already registered")
         ? "Esse e-mail já está cadastrado."
         : "Não foi possível criar a conta. Tente novamente.",
+      success: false,
     };
   }
 
@@ -61,10 +87,7 @@ export async function signup(
   // created yet — sending the user to the dashboard would just bounce
   // them back to /login via the auth guard.
   if (!data.session) {
-    return {
-      error:
-        "Conta criada! Confirme seu e-mail (verifique a caixa de entrada) antes de entrar.",
-    };
+    return { error: null, success: true };
   }
 
   redirect("/");

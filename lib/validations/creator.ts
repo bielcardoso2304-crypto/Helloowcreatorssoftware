@@ -39,18 +39,40 @@ export const creatorProfileSchema = z.object({
     message: "Selecione a plataforma principal",
   }),
   instagram_handle: optionalText(100),
-  instagram_url: optionalUrl,
   instagram_followers: optionalFollowers,
   tiktok_handle: optionalText(100),
-  tiktok_url: optionalUrl,
   tiktok_followers: optionalFollowers,
   youtube_handle: optionalText(100),
-  youtube_url: optionalUrl,
   youtube_followers: optionalFollowers,
   other_platform_name: optionalText(100),
   other_url: optionalUrl,
   preferred_contact: optionalEnum(["whatsapp", "email", "instagram"]),
   commercial_info: optionalText(1000),
+}).superRefine((data, ctx) => {
+  // Followers are only required for a network the creator actually says
+  // they use (i.e. filled in the @) — leaving a network out entirely is
+  // fine, saying you're on it without a follower count isn't.
+  if (data.instagram_handle && data.instagram_followers === undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Informe seus seguidores do Instagram",
+      path: ["instagram_followers"],
+    });
+  }
+  if (data.tiktok_handle && data.tiktok_followers === undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Informe seus seguidores do TikTok",
+      path: ["tiktok_followers"],
+    });
+  }
+  if (data.youtube_handle && data.youtube_followers === undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Informe seus inscritos do YouTube",
+      path: ["youtube_followers"],
+    });
+  }
 });
 export type CreatorProfileInput = z.infer<typeof creatorProfileSchema>;
 

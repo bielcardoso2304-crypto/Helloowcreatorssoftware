@@ -26,7 +26,7 @@ function useNavItems(isAdmin: boolean) {
 export function MobileTopBar() {
   return (
     <header className="flex items-center justify-between border-b p-3 md:hidden">
-      <Logo className="text-sm" />
+      <Logo className="h-14" />
       <div className="flex items-center gap-2">
         <ThemeToggle />
         <form action={logout}>

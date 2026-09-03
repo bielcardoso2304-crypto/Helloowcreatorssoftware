@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Logo } from "@/components/logo";
+import { LogoIsotipo } from "@/components/logo-isotipo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function AuthLayout({
@@ -26,10 +26,19 @@ export default async function AuthLayout({
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <Link href="/login">
-            <Logo className="text-xl" />
+            <LogoIsotipo className="h-24" />
           </Link>
         </div>
         {children}
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          <Link href="/termos" className="underline underline-offset-4">
+            Termos de Uso
+          </Link>{" "}
+          ·{" "}
+          <Link href="/privacidade" className="underline underline-offset-4">
+            Política de Privacidade
+          </Link>
+        </p>
       </div>
     </div>
   );

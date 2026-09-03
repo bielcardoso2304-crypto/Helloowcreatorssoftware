@@ -63,10 +63,36 @@ export function CreatorProfileForm({
   const formRef = useRef<HTMLFormElement>(null);
   const isLastStep = step === steps.length - 1;
 
+  // Followers are only required for a network the creator says they use
+  // (i.e. they filled in the @) — sets a custom validity message on the
+  // followers field so the native checkValidity() loop below catches it.
+  function syncFollowersRequirement() {
+    const pairs: [string, string][] = [
+      ["instagram_handle", "instagram_followers"],
+      ["tiktok_handle", "tiktok_followers"],
+      ["youtube_handle", "youtube_followers"],
+    ];
+    for (const [handleName, followersName] of pairs) {
+      const handleEl = formRef.current?.elements.namedItem(
+        handleName
+      ) as HTMLInputElement | null;
+      const followersEl = formRef.current?.elements.namedItem(
+        followersName
+      ) as HTMLInputElement | null;
+      if (!handleEl || !followersEl) continue;
+      followersEl.setCustomValidity(
+        handleEl.value.trim() && !followersEl.value
+          ? "Informe a quantidade, ou apague o @ se você não usa essa rede"
+          : ""
+      );
+    }
+  }
+
   function goToStep(target: number) {
     // Validate every field on the *current* step before leaving it — native
     // constraint validation skips hidden fields, so without this a required
     // field on an earlier step could otherwise be silently skipped.
+    syncFollowersRequirement();
     const container = formRef.current?.querySelector(`[data-step="${step}"]`);
     if (container) {
       for (const el of container.querySelectorAll("input, select, textarea")) {
@@ -221,7 +247,8 @@ export function CreatorProfileForm({
 
           <div data-step={3} className={cn("space-y-4", step !== 3 && "hidden")}>
             <p className="text-sm text-muted-foreground">
-              Tudo aqui é opcional — preencha se você usa essa rede.
+              Deixe em branco se você não usa essa rede. Se preencher o @,
+              a quantidade de seguidores é obrigatória.
             </p>
             <div className="space-y-2">
               <Label htmlFor="instagram_handle">Instagram (@)</Label>
@@ -230,15 +257,6 @@ export function CreatorProfileForm({
                 name="instagram_handle"
                 placeholder="@seuusuario"
                 defaultValue={defaultValues?.instagram_handle ?? ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="instagram_url">Link do Instagram</Label>
-              <Input
-                id="instagram_url"
-                name="instagram_url"
-                placeholder="https://instagram.com/seuusuario"
-                defaultValue={defaultValues?.instagram_url ?? ""}
               />
             </div>
             <div className="space-y-2">
@@ -255,7 +273,8 @@ export function CreatorProfileForm({
 
           <div data-step={4} className={cn("space-y-4", step !== 4 && "hidden")}>
             <p className="text-sm text-muted-foreground">
-              Tudo aqui é opcional — preencha se você usa essa rede.
+              Deixe em branco se você não usa essa rede. Se preencher o @,
+              a quantidade de seguidores é obrigatória.
             </p>
             <div className="space-y-2">
               <Label htmlFor="tiktok_handle">TikTok (@)</Label>
@@ -264,15 +283,6 @@ export function CreatorProfileForm({
                 name="tiktok_handle"
                 placeholder="@seuusuario"
                 defaultValue={defaultValues?.tiktok_handle ?? ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tiktok_url">Link do TikTok</Label>
-              <Input
-                id="tiktok_url"
-                name="tiktok_url"
-                placeholder="https://tiktok.com/@seuusuario"
-                defaultValue={defaultValues?.tiktok_url ?? ""}
               />
             </div>
             <div className="space-y-2">
@@ -289,24 +299,16 @@ export function CreatorProfileForm({
 
           <div data-step={5} className={cn("space-y-4", step !== 5 && "hidden")}>
             <p className="text-sm text-muted-foreground">
-              Tudo aqui é opcional — preencha se você usa essa rede.
+              Deixe em branco se você não usa essa rede. Se preencher o @,
+              a quantidade de seguidores é obrigatória.
             </p>
             <div className="space-y-2">
-              <Label htmlFor="youtube_handle">YouTube (canal)</Label>
+              <Label htmlFor="youtube_handle">YouTube (@)</Label>
               <Input
                 id="youtube_handle"
                 name="youtube_handle"
-                placeholder="Nome do canal"
+                placeholder="@seucanal"
                 defaultValue={defaultValues?.youtube_handle ?? ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="youtube_url">Link do YouTube</Label>
-              <Input
-                id="youtube_url"
-                name="youtube_url"
-                placeholder="https://youtube.com/@seucanal"
-                defaultValue={defaultValues?.youtube_url ?? ""}
               />
             </div>
             <div className="space-y-2">

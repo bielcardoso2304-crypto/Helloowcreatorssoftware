@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Logo } from "@/components/logo";
+import { LogoIsotipo } from "@/components/logo-isotipo";
 
 // Standalone route (outside (auth)/(dashboard)) because the recovery link
 // from the e-mail carries the session in the URL fragment, which only the
@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
     <div className="relative flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
-          <Logo className="text-xl" />
+          <LogoIsotipo className="h-24" />
         </div>
         <Card>
           <CardHeader>
