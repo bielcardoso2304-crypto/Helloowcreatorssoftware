@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import { createDeal, type DealActionState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,33 +65,22 @@ export function NewDealForm({
 
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="brand_id">Marca</Label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <select
-                id="brand_id"
-                name="brand_id"
-                required
-                defaultValue=""
-                className={selectClassName + " sm:flex-1"}
-              >
-                <option value="" disabled>
-                  Selecione...
+            <select
+              id="brand_id"
+              name="brand_id"
+              required
+              defaultValue=""
+              className={selectClassName}
+            >
+              <option value="" disabled>
+                Selecione...
+              </option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
                 </option>
-                {brands.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-              <Button
-                variant="outline"
-                size="sm"
-                nativeButton={false}
-                className="sm:shrink-0"
-                render={
-                  <Link href="/admin/marcas">+ Cadastrar nova marca</Link>
-                }
-              />
-            </div>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-2">

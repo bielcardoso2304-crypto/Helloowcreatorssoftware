@@ -139,3 +139,30 @@
     @apply font-sans;
   }
 }
+
+/* Splash screen shown once per tab session on entering the app — see
+   splash-screen.tsx. Each piece of the mark flies in from --tx/--ty (set
+   per piece as an inline custom property) and lands at its natural spot,
+   so the whole hand+smile mark assembles itself on screen. */
+@keyframes piece-in {
+  0% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.6);
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes splash-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
