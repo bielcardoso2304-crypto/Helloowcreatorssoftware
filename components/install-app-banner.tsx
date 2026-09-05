@@ -28,7 +28,10 @@ export function InstallAppBanner() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem(DISMISS_KEY)) return;
+    // Session-scoped on purpose: closing the banner (or trying to install
+    // and backing out of the native prompt) shouldn't hide it forever —
+    // just for the rest of this visit.
+    if (sessionStorage.getItem(DISMISS_KEY)) return;
     if (isStandalone()) return;
 
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -45,16 +48,18 @@ export function InstallAppBanner() {
   }, []);
 
   function dismiss() {
-    localStorage.setItem(DISMISS_KEY, "1");
+    sessionStorage.setItem(DISMISS_KEY, "1");
     setDismissed(true);
   }
 
   async function install() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
-    dismiss();
+    // Only hide it for good if they actually installed — backing out of
+    // the native prompt should leave the banner up to try again.
+    if (outcome === "accepted") dismiss();
   }
 
   if (dismissed || !platform) return null;
