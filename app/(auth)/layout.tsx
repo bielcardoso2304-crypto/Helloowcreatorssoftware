@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { LogoIsotipo } from "@/components/logo-isotipo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { InstallAppBanner } from "@/components/install-app-banner";
 
 export default async function AuthLayout({
   children,
@@ -29,6 +30,7 @@ export default async function AuthLayout({
             <LogoIsotipo className="h-24" />
           </Link>
         </div>
+        <InstallAppBanner />
         {children}
         <p className="mt-6 text-center text-xs text-muted-foreground">
           <Link href="/termos" className="underline underline-offset-4">
