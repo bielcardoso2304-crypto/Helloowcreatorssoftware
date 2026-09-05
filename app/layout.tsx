@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "Helloow Creators",
   },
   icons: {
-    apple: "/apple-touch-icon.png",
+    apple: "/apple-touch-icon-v2.png",
   },
 };
 
